@@ -9,23 +9,6 @@
 create extension if not exists "pgcrypto";
 
 -- ----------------------------------------------------------------
--- HELPER: is_workspace_member
--- ----------------------------------------------------------------
-create or replace function is_workspace_member(p_workspace_id uuid, p_user_id uuid)
-returns boolean
-language sql
-security definer
-stable
-as $$
-  select exists (
-    select 1
-    from   workspace_members
-    where  workspace_id = p_workspace_id
-    and    user_id      = p_user_id
-  );
-$$;
-
--- ----------------------------------------------------------------
 -- TABLE: profiles
 -- ----------------------------------------------------------------
 create table if not exists profiles (
@@ -61,6 +44,23 @@ create table if not exists workspace_members (
   joined_at    timestamptz not null default now(),
   unique (workspace_id, user_id)
 );
+
+-- ----------------------------------------------------------------
+-- HELPER: is_workspace_member  (placed after workspace_members table)
+-- ----------------------------------------------------------------
+create or replace function is_workspace_member(p_workspace_id uuid, p_user_id uuid)
+returns boolean
+language sql
+security definer
+stable
+as $$
+  select exists (
+    select 1
+    from   workspace_members
+    where  workspace_id = p_workspace_id
+    and    user_id      = p_user_id
+  );
+$$;
 
 -- ----------------------------------------------------------------
 -- TABLE: spaces
