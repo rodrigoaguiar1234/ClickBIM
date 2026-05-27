@@ -19,7 +19,7 @@ import { useUpdateTask, useUpdateTaskStatus } from '@/src/lib/mutations/tasks'
 import { PRIORITY_CONFIG } from '@/src/lib/constants/priorities'
 import { TaskStatusBadge } from './TaskStatusBadge'
 import { TaskPriorityBadge } from './TaskPriorityBadge'
-import type { Priority } from '@/src/types/index'
+import type { Priority, TaskAssignee, TaskTagEntry, Comment } from '@/src/types/index'
 
 const PRIORITIES: Priority[] = ['urgent', 'high', 'normal', 'low', 'none']
 
@@ -238,24 +238,27 @@ export function TaskDetailPanel() {
                 </h3>
                 {task.assignees && task.assignees.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
-                    {task.assignees.map(({ user }) => (
-                      <div
-                        key={user?.id}
-                        className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1"
-                      >
-                        <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-[9px] font-bold text-white overflow-hidden">
-                          {user?.avatar_url ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={user.avatar_url} alt={user.full_name ?? ''} className="w-full h-full object-cover" />
-                          ) : (
-                            (user?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
-                          )}
+                    {task.assignees.map((assignee: TaskAssignee) => {
+                      const user = assignee.user
+                      return (
+                        <div
+                          key={assignee.user_id}
+                          className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-full px-2 py-1"
+                        >
+                          <div className="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-[9px] font-bold text-white overflow-hidden">
+                            {user?.avatar_url ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img src={user.avatar_url} alt={user.full_name ?? ''} className="w-full h-full object-cover" />
+                            ) : (
+                              (user?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-700 dark:text-gray-300">
+                            {user?.full_name ?? user?.email}
+                          </span>
                         </div>
-                        <span className="text-xs text-gray-700 dark:text-gray-300">
-                          {user?.full_name ?? user?.email}
-                        </span>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 ) : (
                   <p className="text-xs text-gray-400 italic">No assignees</p>
@@ -288,18 +291,21 @@ export function TaskDetailPanel() {
                 </h3>
                 {task.tags && task.tags.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {task.tags.map(({ tag }) => (
-                      <span
-                        key={tag?.id}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                        style={{
-                          backgroundColor: tag?.color ? `${tag.color}25` : '#F3F4F6',
-                          color: tag?.color ?? '#6B7280',
-                        }}
-                      >
-                        {tag?.name}
-                      </span>
-                    ))}
+                    {task.tags.map((entry: TaskTagEntry) => {
+                      const tag = entry.tag
+                      return (
+                        <span
+                          key={entry.tag_id}
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                          style={{
+                            backgroundColor: tag?.color ? `${tag.color}25` : '#F3F4F6',
+                            color: tag?.color ?? '#6B7280',
+                          }}
+                        >
+                          {tag?.name}
+                        </span>
+                      )
+                    })}
                   </div>
                 ) : (
                   <p className="text-xs text-gray-400 italic">No tags</p>
@@ -313,7 +319,7 @@ export function TaskDetailPanel() {
                 </h3>
                 <div className="space-y-3">
                   {task.comments && task.comments.length > 0 ? (
-                    task.comments.map((comment) => (
+                    task.comments.map((comment: Comment) => (
                       <div key={comment.id} className="flex gap-2">
                         <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0">
                           {(comment.author?.full_name ?? comment.author?.email ?? '?')

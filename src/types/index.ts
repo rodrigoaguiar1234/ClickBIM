@@ -84,6 +84,9 @@ export interface Project {
   due_date?: string | null
   created_by?: string | null
   created_at: string
+  // Computed
+  task_count?: number
+  completed_count?: number
   // Relations
   lists?: List[]
 }
@@ -100,6 +103,8 @@ export interface List {
   is_archived: boolean
   created_by?: string | null
   created_at: string
+  // Computed
+  task_count?: number
   // Relations
   statuses?: TaskStatus[]
   tasks?: Task[]
@@ -214,9 +219,11 @@ export interface Attachment {
 // ----------------------------------------------------------------
 export interface ActivityLog {
   id: string
-  task_id: string
+  task_id?: string
   actor_id?: string | null
   action: string
+  entity_type?: string
+  entity_id?: string
   old_value?: unknown | null
   new_value?: unknown | null
   created_at: string
@@ -234,4 +241,14 @@ export interface Notification {
   payload?: unknown | null
   is_read: boolean
   created_at: string
+}
+
+// ----------------------------------------------------------------
+// Dashboard
+// ----------------------------------------------------------------
+export interface DashboardStats {
+  open: number
+  inProgress: number
+  completedToday: number
+  overdue: number
 }
