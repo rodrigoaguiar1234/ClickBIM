@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { redirect, notFound } from 'next/navigation'
 import { createClient } from '@/src/lib/supabase/server'
 import type { Workspace } from '@/src/types'

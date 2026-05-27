@@ -1,10 +1,11 @@
+export const dynamic = 'force-dynamic'
 import { createClient } from '@/src/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { ViewSwitcher } from '@/src/components/views/ViewSwitcher'
-import { GanttView } from '@/src/components/views/GanttView'
+import { KanbanBoard } from '@/src/components/views/KanbanBoard'
 import { TaskDetailPanel } from '@/src/components/tasks/TaskDetailPanel'
 
-interface GanttPageProps {
+interface BoardPageProps {
   params: Promise<{
     workspaceSlug: string
     spaceId: string
@@ -13,7 +14,7 @@ interface GanttPageProps {
   }>
 }
 
-export default async function GanttPage({ params }: GanttPageProps) {
+export default async function BoardPage({ params }: BoardPageProps) {
   const { workspaceSlug, spaceId, projectId, listId } = await params
 
   const supabase = await createClient()
@@ -31,7 +32,7 @@ export default async function GanttPage({ params }: GanttPageProps) {
     (a: { position: number }, b: { position: number }) => a.position - b.position
   )
 
-  // Fetch tasks (include those with dates for the Gantt)
+  // Fetch tasks with relations
   const { data: tasks, error: taskError } = await supabase
     .from('tasks')
     .select(
@@ -43,7 +44,7 @@ export default async function GanttPage({ params }: GanttPageProps) {
     .order('position')
 
   if (taskError) {
-    console.error('Error fetching tasks for Gantt:', taskError)
+    console.error('Error fetching tasks for board:', taskError)
   }
 
   const basePath = `/${workspaceSlug}/spaces/${spaceId}/projects/${projectId}/${listId}`
@@ -56,13 +57,13 @@ export default async function GanttPage({ params }: GanttPageProps) {
         <span>/</span>
         <span className="text-gray-700 dark:text-gray-300 font-medium">{list.name}</span>
         <span>/</span>
-        <span className="text-orange-500 font-medium">Gantt</span>
+        <span className="text-orange-500 font-medium">Board</span>
       </div>
 
       <ViewSwitcher basePath={basePath} />
 
-      <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900">
-        <GanttView
+      <div className="flex-1 overflow-hidden bg-gray-50 dark:bg-gray-900">
+        <KanbanBoard
           statuses={statuses}
           tasks={tasks ?? []}
           listId={listId}
