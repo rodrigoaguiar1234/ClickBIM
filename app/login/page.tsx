@@ -37,7 +37,13 @@ export default function LoginPage() {
       password: data.password,
     })
     if (error) {
-      setAuthError('E-mail ou senha incorretos. Tente novamente.')
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        setAuthError('E-mail não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.')
+      } else if (error.message.toLowerCase().includes('invalid login credentials') || error.message.toLowerCase().includes('invalid credentials')) {
+        setAuthError('E-mail ou senha incorretos. Tente novamente.')
+      } else {
+        setAuthError(error.message)
+      }
       return
     }
     router.push('/dashboard')
